@@ -83,6 +83,7 @@ RoboGaze diagnoses **visible failures in a single camera view**. An empty report
 - [Run Batch Inference](#run-batch-inference)
 - [Evaluate Predictions](#evaluate-predictions)
 - [Citation](#citation)
+- [Acknowledgements](#acknowledgements)
 
 ## Installation
 
@@ -206,3 +207,21 @@ If you find RoboGaze useful for your research, please cite:
   url = {https://arxiv.org/abs/2606.28385}
 }
 ```
+
+## Acknowledgements
+
+We thank the researchers and maintainers who release the models, datasets, and open-source tools that make this work possible, and the annotators who contributed the time-stamped failure annotations for RoboGazeBench.
+
+The released implementation uses the following tools:
+
+| Role | Projects |
+|---|---|
+| OpenAI-compatible VLM client | [OpenAI Python SDK](https://github.com/openai/openai-python) |
+| Optional local VLM serving | [vLLM](https://github.com/vllm-project/vllm) |
+| Video and image processing | [FFmpeg](https://ffmpeg.org/), [OpenCV](https://opencv.org/), [Pillow](https://python-pillow.org/) |
+| Structured data and numerical utilities | [Pydantic](https://docs.pydantic.dev/), [SciPy](https://scipy.org/) |
+| Environment management | [uv](https://github.com/astral-sh/uv) |
+
+For the research benchmark, we acknowledge the teams behind **Cosmos-Predict2.5, DreamGen, DreamDojo, Wan 2.2, and Veo**, whose generators were used to produce the videos studied in the paper, as well as the creators of the source robot datasets and the VLM backbones evaluated in our experiments. Full experimental details and references are provided in the [paper](https://arxiv.org/abs/2606.28385).
+
+Third-party software, model weights, and source datasets remain subject to their respective licenses and terms.
