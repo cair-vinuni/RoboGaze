@@ -1,7 +1,7 @@
 # RoboGaze: Evaluating Robot World Models via Structured Vision-Language Analysis
 
 <p align="center">
-  <img src="assets/robogaze_overview.jpg" alt="RoboGaze overview" width="100%">
+  <img src="assets/teaser.webp" alt="A scalar judge misses object penetration; RoboGaze localizes and explains the failure, with benchmark results" width="100%">
 </p>
 
 <p align="center">
@@ -14,6 +14,15 @@ RoboGaze is a training-free, multi-agent VLM framework for diagnosing failures i
 
 This repository contains the official RoboGaze code release, including the local inference pipeline, OpenAI-compatible VLM client, batch runners, evaluation utilities, and static project page assets.
 
+## Highlights
+
+- **Explain each failure:** what failed, when, why, and how severely, rather than one score per video.
+- **Training-free:** task-scene grounding, dimension-specific specialists, and critic verification on a frozen VLM.
+- **RoboGazeBench:** 914 human-annotated generated manipulation clips, 1,847 time-stamped failures, six dimensions and 30 failure types.
+- **Eight VLM backbones:** +11.3 description F1 points over the strongest baseline on average; correct empty reports on clean clips rise from 17% with CoT to 85% with RoboGaze.
+
+Watch the [interactive diagnosis demos](https://robogaze-eval.github.io/#demo) or the [overview video](https://robogaze-eval.github.io/#overview).
+
 ## Overview
 
 Robot world models can generate visually plausible manipulation rollouts that still violate task logic, physical plausibility, robot-body consistency, or object-scene consistency. Scalar metrics and monolithic VLM judges often miss these errors or over-report failures in clean clips.
@@ -25,13 +34,49 @@ RoboGaze addresses this with a three-stage diagnostic pipeline:
 3. **Critic verification**: re-examines candidate glitches, rejects weak hypotheses, merges duplicates, refines temporal boundaries, and emits a final structured report.
 
 <p align="center">
-  <img src="assets/pipeline.png" alt="RoboGaze three-stage pipeline" width="100%">
+  <img src="assets/pipeline.webp" alt="RoboGaze three-stage pipeline" width="100%">
 </p>
 
 The released implementation is intentionally transparent: intermediate JSON files and generated view clips are written to disk so that failed or ambiguous runs can be inspected.
 
+## Results
+
+Selected results from the [project page](https://robogaze-eval.github.io/#results). F1 values are reported on a 0–100 scale; clean-clip accuracy measures correct empty reports on failure-free videos.
+
+| Evaluation | Comparison | RoboGaze |
+|---|---:|---:|
+| Description F1, mean over 8 backbones | Strongest baseline | **+11.3 points** |
+| Clean-clip accuracy, mean over 8 backbones | CoT: 17%; GLiDE+: 68% | **85%** |
+| Event F1, re-scored by blind human raters on the gold subset | GLiDE+: 61.4 | **71.6** |
+| Usable-clip precision when selecting the top half of six candidates per condition | GLiDE+: 71%; random: 49% | **80%** |
+| Description F1 gain on clips longer than 80 seconds | GLiDE+ | **+16.6 points** |
+
+On Gemini 3.1 Pro, RoboGaze closes **83% of the gap** between chain-of-thought prompting and human agreement. See the [paper](https://arxiv.org/abs/2606.28385) for the full protocol and per-backbone comparisons.
+
+## RoboGazeBench
+
+The benchmark contains **914 clips from five generators**, spanning **4.9–148.9 seconds**, with **1,847 time-stamped failures** and **210 failure-free clips**. It covers simulated and real-world conditioning data and six diagnostic dimensions with 30 failure types.
+
+Browse [benchmark coverage and the taxonomy](https://robogaze-eval.github.io/#benchmark). **Benchmark download: coming soon.** The inference code is available in this repository.
+
+## Using and extending RoboGaze
+
+[![Three ways to use RoboGaze: diagnose videos, benchmark an evaluator, or extend the framework](assets/using_robogaze.webp)](https://robogaze-eval.github.io/#use)
+
+| Goal | Start here |
+|---|---|
+| Diagnose your generated robot videos | [Single-video inference](#run-single-video-inference) or [batch inference](#run-batch-inference) |
+| Compare event reports against human references | [Evaluate predictions](#evaluate-predictions); benchmark download pending |
+| Use another VLM backbone | Configure the OpenAI-compatible endpoint and model in [single-video inference](#run-single-video-inference) |
+
+RoboGaze diagnoses **visible failures in a single camera view**. An empty report does not establish that a generated behavior can be executed on a real robot. The pipeline uses several VLM calls per clip.
+
 ## Table of Contents
 
+- [Overview](#overview)
+- [Results](#results)
+- [RoboGazeBench](#robogazebench)
+- [Using and extending RoboGaze](#using-and-extending-robogaze)
 - [Installation](#installation)
 - [Serve a Local VLM](#serve-a-local-vlm)
 - [Run Single-Video Inference](#run-single-video-inference)
@@ -147,10 +192,17 @@ uv run python scripts/evaluate.py \
 If you find RoboGaze useful for your research, please cite:
 
 ```bibtex
-@article{nguyen2026robogaze,
-  title={RoboGaze: Evaluating Robot World Models via Structured Vision-Language Analysis},
-  author={Nguyen, Minh-Loi and Diep, Nghiem Tuong and Nguyen, Hung Khang and Le, Minh and Thien, Doanh Le and Tran, Hoang H and Le, Dung D and Duong, Vu N and Sonntag, Daniel and Le, An Thai and others},
-  journal={arXiv preprint arXiv:2606.28385},
-  year={2026}
+@misc{nguyen2026robogaze,
+  title = {RoboGaze: Evaluating Robot World Models via Structured Vision-Language Analysis},
+  author = {Nguyen, Minh-Loi and Diep, Nghiem T. and Nguyen, Hung K. and Le, Minh and
+            Thien, Doanh L. and Tran, Tuan A. and Tran, Hoang H. and Le, Dung D. and
+            Duong, Vu N. and Doan, Khoa D. and Le, Ngan and Sonntag, Daniel and
+            Le, An T. and Ngo, Vien Anh and Nguyen, Duy M. H. and Nhiem, Tran V.},
+  year = {2026},
+  eprint = {2606.28385},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.RO},
+  doi = {10.48550/arXiv.2606.28385},
+  url = {https://arxiv.org/abs/2606.28385}
 }
 ```
